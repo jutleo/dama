@@ -36,14 +36,18 @@
     </div>
 
     <script>
-        var getWTHTML = function(dama, sno) {
-            return '<div style="padding:15px 0">' + sno + '、' + dama.wt + '</div>';
+        var getWTHTML = function(dama) {
+            return '<div style="padding:15px 0">' + dama.sno + '、' + dama.wt + '</div>';
         };
-        var getXXHTML = function(dama, sno) {
+        var getXXHTML = function(dama) {
             var xxArray = [];
-            xxArray.push('<div id="xx_' + sno + '">');
+            xxArray.push('<div id="xx_' + dama.sno + '">');
             for (var x = 0, xLne = dama.xx.length; x < xLne; x++) {
-                xxArray.push('<p onclick="selectItemAction(' + sno + ')">' + dama.xx[x] + '</p>');
+                if ((dama.sy || dama.sy === 'true') && dama.xx[x] === dama.da) {
+                    xxArray.push('<p onclick="selectItemAction(' + dama.sno + ')" class="yes">' + dama.xx[x] + '</p>');
+                } else {
+                    xxArray.push('<p onclick="selectItemAction(' + dama.sno + ')">' + dama.xx[x] + '</p>');
+                }
             }
             xxArray.push('</div>');
             return xxArray.join('');
@@ -54,6 +58,7 @@
             for (var y = 0; y < items.length; y++) {
                 if (damas[sno - 1].da === items[y]) {
                     itemArray.push('<p class="yes">' + items[y] + '</p>');
+                    localStorage.setItem("dama_sno_" + sno, true);
                 } else {
                     itemArray.push('<p>' + items[y] + '</p>');
                 }
@@ -64,6 +69,9 @@
         var allHTML = [];
 
         for (var i = 0, iLen = damas.length; i < iLen; i++) {
+            if (localStorage.getItem("dama_sno_" + (i + 1)) || localStorage.getItem("dama_sno_" + (i + 1)) === "true") {
+                damas[i].sy = true;
+            }
             allHTML.push('<div>');
             allHTML.push(getWTHTML(damas[i], i + 1));
             allHTML.push(getXXHTML(damas[i], i + 1));
