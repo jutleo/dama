@@ -20,6 +20,10 @@
             color: #FFF;
             background-color: rgb(51.2, 126.4, 204);
         }
+        .selected {
+            color: #FFF;
+            background-color: rgb(196, 86.4, 86.4);
+        }
     </style>
     <script type="text/javascript">
         document.addEventListener('plusready', function() {
@@ -30,9 +34,8 @@
 </head>
 
 <body>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
     <div id="damas" style="padding: 1px 2px;">
+
     </div>
 
     <script>
@@ -43,24 +46,37 @@
             var xxArray = [];
             xxArray.push('<div id="xx_' + dama.sno + '">');
             for (var x = 0, xLne = dama.xx.length; x < xLne; x++) {
-                if ((dama.sy || dama.sy === 'true') && dama.xx[x] === dama.da) {
-                    xxArray.push('<p onclick="selectItemAction(' + dama.sno + ')" class="yes">' + dama.xx[x] + '</p>');
+                if(dama.sy) {
+                    if(dama.xx[x] === dama.da) {
+                        xxArray.push('<p onclick="selectItemAction(' + dama.sno + ','+x+')" class="yes">' + dama.xx[x] + '</p>');
+                    } else {
+                        if(dama.xx[x] === dama.sy) {
+                            xxArray.push('<p onclick="selectItemAction(' + dama.sno + ','+x+')" class="selected">' + dama.xx[x] + '</p>');
+                        } else {
+                            xxArray.push('<p onclick="selectItemAction(' + dama.sno + ','+x+')">' + dama.xx[x] + '</p>');
+                        }
+                    }
                 } else {
-                    xxArray.push('<p onclick="selectItemAction(' + dama.sno + ')">' + dama.xx[x] + '</p>');
+                    xxArray.push('<p onclick="selectItemAction(' + dama.sno + ','+x+')">' + dama.xx[x] + '</p>');
                 }
             }
             xxArray.push('</div>');
             return xxArray.join('');
         };
-        var selectItemAction = function(sno) {
+
+        var selectItemAction = function(sno, inx) {
             var items = damas[sno - 1].xx;
             var itemArray = [];
+            localStorage.setItem("dama_sno_" + sno, items[inx]);
             for (var y = 0; y < items.length; y++) {
-                if (damas[sno - 1].da === items[y]) {
+                if(damas[sno - 1].da === items[y]) {
                     itemArray.push('<p class="yes">' + items[y] + '</p>');
-                    localStorage.setItem("dama_sno_" + sno, true);
                 } else {
-                    itemArray.push('<p>' + items[y] + '</p>');
+                    if(inx === y) {
+                        itemArray.push('<p class="selected">' + items[y] + '</p>');
+                    } else {
+                        itemArray.push('<p>' + items[y] + '</p>');
+                    }
                 }
             }
             document.getElementById('xx_' + sno).innerHTML = itemArray.join('');
@@ -69,8 +85,8 @@
         var allHTML = [];
 
         for (var i = 0, iLen = damas.length; i < iLen; i++) {
-            if (localStorage.getItem("dama_sno_" + (i + 1)) || localStorage.getItem("dama_sno_" + (i + 1)) === "true") {
-                damas[i].sy = true;
+            if (localStorage.getItem("dama_sno_" + (i + 1))) {
+                damas[i].sy = localStorage.getItem("dama_sno_" + (i + 1));
             }
             allHTML.push('<div>');
             allHTML.push(getWTHTML(damas[i], i + 1));
