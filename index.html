@@ -9,7 +9,14 @@
     <style>
         body {
             font-size: 16px;
-            font-family: Noto Sans SC, Verdana, Geneva, sans-serif;
+        }
+        .number {
+            position: fixed;
+            top: 30px;
+            left: 40%;
+            color: red;
+            font-size: 22px;
+            font-weight: bold;
         }
         
         p {
@@ -36,11 +43,14 @@
 </head>
 
 <body>
+    <div class="number" id="error_total">0</div>
     <div id="damas" style="padding: 1px 2px;">
 
     </div>
 
     <script>
+        //定义错题数
+        var error_total = 0;
         var getWTHTML = function(dama) {
             return '<div style="padding:15px 0">' + dama.sno + '、' + dama.wt + '</div>';
         };
@@ -70,11 +80,17 @@
             var items = damas[sno - 1].xx;
             var itemArray = [];
             localStorage.setItem("dama_sno_" + sno, items[inx]);
+
             for (var y = 0; y < items.length; y++) {
+                //正确答案
                 if(damas[sno - 1].da === items[y]) {
                     itemArray.push('<p class="yes">' + items[y] + '</p>');
                 } else {
                     if(inx === y) {
+                        //没有选对
+                        error_total = error_total + 1;
+                        localStorage.setItem('error_total', error_total);
+                        document.getElementById('error_total').innerText = error_total;
                         itemArray.push('<p class="selected">' + items[y] + '</p>');
                     } else {
                         itemArray.push('<p>' + items[y] + '</p>');
@@ -97,6 +113,10 @@
         }
 
         document.getElementById('damas').innerHTML = allHTML.join('');
+        if(localStorage.getItem('error_total')) {
+            error_total = parseInt(localStorage.getItem('error_total'));
+        }
+        document.getElementById('error_total').innerText = error_total;
     </script>
 </body>
 
